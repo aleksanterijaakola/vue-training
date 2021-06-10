@@ -1,63 +1,42 @@
 <template>
-  <div>
-    <!-- add a new task input -->
+  <div class="space-y-4">
     <add-new-task @task-added="onTaskAdded" />
 
-    <!-- show progress of tasks -->
-    <tasks-progress v-if="tasks.length" class="mt-4" :tasks="tasks" />
+    <tasks-progress />
 
-    <!-- list tasks -->
-    <ul v-if="tasks.length" class="mt-4 list-disc ml-4">
-      <li
-        v-for="(task, index) in tasks"
-        :key="index"
-        :class="{ 'text-green-500 line-through': task.completed }"
-      >
-        {{ task.name }}
-
-        <!-- mark a task as completed -->
-        <button
-          type="button"
-          class="px-2 rounded bg-green-400 text-white hover:bg-green-600"
-          @click="completeTask(task)"
-        >
-          ✓
-        </button>
-
-        <!-- delete a task -->
-        <button
-          type="button"
-          class="ml-2 px-2 rounded bg-red-400 text-white hover:bg-red-600"
-          @click="deleteTask(task)"
-        >
-          &times;
-        </button>
-      </li>
-    </ul>
+    <tasks-list
+      v-if="tasks.length"
+      :tasks="tasks"
+      @complete="onComplete"
+      @delete="onDelete"
+    />
   </div>
 </template>
 
 <script>
 import AddNewTask from '@/components/AddNewTask'
 import TasksProgress from '@/components/TasksProgress'
+import TasksList from '@/components/TasksList'
 export default {
   components: {
     AddNewTask,
-    TasksProgress
+    TasksProgress,
+    TasksList
   },
-  data: () => ({
-    tasks: []
-  }),
+  computed: {
+    tasks() {
+      return this.$store.state.tasks.items
+    }
+  },
   methods: {
-    completeTask(task) {
-      task.completed = !task.completed
-    },
-    deleteTask(task) {
-      const taskIndex = this.tasks.indexOf(task)
-      this.tasks.splice(taskIndex, 1)
-    },
     onTaskAdded(name) {
-      this.tasks.push({ name, completed: false })
+      this.$store.commit('add', name)
+    },
+    onComplete(task) {
+      this.$store.commit('complete', task)
+    },
+    onDelete(task) {
+      this.$store.commit('delete', task)
     }
   }
 }

@@ -10,6 +10,7 @@
     >
       Home
     </router-link>
+
     <router-link
       :to="{ name: 'Tasks' }"
       class="hover:text-blue-700"
